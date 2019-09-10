@@ -93,7 +93,24 @@ flashback table 表名 to before drop;
 ```sql
 select cartype s,classes s2 from (select distinct cartype from DM_SJZL) ,
 (select distinct classes from DM_CAR_ANALYZE_SCORE_2)
-where SYS.UTL_MATCH.edit_distance_similarity(cartype,classes) >80 and 
-cartype <> classes
+where SYS.UTL_MATCH.edit_distance_similarity(cartype,classes) >80 and cartype <> classes
+```
+
+## 8、树型查询
+
+```sql
+select 
+---截取
+  regexp_substr(path,'[^;]+',1,1) 首字母,
+  regexp_substr(path,'[^;]+',1,2) 车型,
+  regexp_substr(path,'[^;]+',1,3) 厂商,
+  regexp_substr(path,'[^;]+',1,4) 品牌 
+  from(      
+    ---查询结果用；拼接
+select sys_connect_by_path(CHNLNAME,';') path 
+from CHANNELINFO x where level=4
+start with parentid = 4139 and status = 1 
+    ---父ID子ID
+connect by prior CHANNELID=parentid and status = 1)
 ```
 
